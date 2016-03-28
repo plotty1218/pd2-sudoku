@@ -18,7 +18,10 @@ class Sudoku{
 		void flip(int n);
 	 	int su[sudokuSize];
 		void transform();
-
+		bool multiAns1(int su[]);
+		bool multiAns34(int su[]);
+		bool solvable(int su[]);
+		int getFirstZeroIndex();
 	private:
 		bool checkUnity(int arr[]);
 		int map[sudokuSize];

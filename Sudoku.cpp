@@ -75,18 +75,158 @@ bool Sudoku::checkUnity(int arr[]){
 	return true;
 }
 
-
-
-
-int getFirstZeroIndex(){
-	
-	
+int Sudoku::getFirstZeroIndex(){
+	for(int i=0;i<sudokuSize;i++){
+		if(su[i]==0)
+			return i;
+	}	
+	return -1;
 }
 
-void solve(){
+bool Sudoku::multiAns1(int su[]){
+	int ctr=0;
+	int ctr1=0;
+
+	for(int j=0;j<7;j=j+3){
+		for(int i=j*9;i<j*9+9;i++){
+			if(su[i]==0)
+				ctr++;
+		}
+		if(ctr==9)
+			ctr1++;
+		ctr=0;
+		for(int i=j*9+9;i<j*9+18;i++){
+			if(su[i]==0)
+				ctr++;
+		}
+		if(ctr==9)
+			ctr1++;
+		ctr=0;
+		for(int i=j*9+18;i<j*9+27;i++){
+			if(su[i]==0)
+				ctr++;
+		}
+		if(ctr==9)
+			ctr1++;
+		if(ctr1>1)
+			return true;
+	}
+	ctr=0;
+	ctr1=0;
 	
-	if()
+	for(int i=0;i<3;i++){
+		for(int j=i*3;j<i*3+73;j=j+9){
+			if(su[j]==0)
+				ctr++;
+		}
+		if(ctr==9)
+			ctr1++;
+		ctr=0;
+		for(int j=i*3+1;j<i*3+74;j=j+9){
+			if(su[j]==0)
+				ctr++;
+		}
+		if(ctr==9)
+			ctr1++;
+		ctr=0;
+		for(int j=i*3+2;j<i*3+75;j=j+9){
+			if(su[j]==0)
+				ctr++;
+		}
+		if(ctr==9)
+			ctr1++;
+		if(ctr1>1)
+			return true;
+	}
 }
+
+bool Sudoku::multiAns34(int su[]){
+	
+	int check[9];
+	int ctr1=0;
+	int ctr2=0;
+
+	for(int i=0;i<81;i++){
+		if(su[i]!=0)
+			check[su[i]-1]++;
+		else
+			ctr2++;
+	}
+	for(int i=0;i<9;i++){
+		if(check[i]==0)
+			ctr1++;
+	}
+
+	if(ctr1>1 || ctr2>64)
+		return true;
+	else
+		return false;
+}
+
+bool Sudoku::solvable(int su[]){
+	int tmp[9];
+	int tmp1[9];
+	int tmp2[9];
+
+	for(int i=0;i<81;i=i+9){
+		for(int j=i;j<i+9;j++){
+			if(su[j]!=0)
+				tmp[su[j]-1]++;
+		}
+		for(int k=0;k<9;k++){
+			if(tmp[k]>1)
+				return false;
+		}
+		for(int l=0;l<9;l++)
+			tmp[l]=0;
+	}
+
+	for(int i=0;i<9;i++){
+		for(int j=i;j<i+81;j=j+9){
+			if(su[j]!=0)
+				tmp1[su[j]-1]++;
+		}
+		for(int k=0;k<9;k++){
+			if(tmp1[k]>1)
+				return false;
+		}
+		for(int l=0;l<9;l++){
+			tmp1[l]=0;
+		}
+	}
+
+	for(int i=0;i<9;i++){
+		for(int j=0;j<9;j++){
+			if(su[27*(i/3)+3*(i%3)+9*(j/3)+(j%3)]!=0)
+				tmp2[su[27*(i/3)+3*(i%3)+9*(j/3)+(j%3)]-1]++;
+		}
+		for(int k=0;k<9;k++){
+			if(tmp2[k]>1)
+				return false;
+		}
+		for(int l=0;l<9;l++){
+			tmp2[l]=0;
+		}
+	}
+	return true;
+}
+void Sudoku::solve(){
+
+	int firstZero;
+	readIn();
+
+	if(!solvable(su))
+		cout << 0 << endl;
+	if(multiAns1(su) || multiAns34(su))
+		cout << 2 << endl;
+
+	firstZero=getFirstZeroIndex();
+	if(firstZero==-1){
+		
+	}
+}
+
+
 
 
 
