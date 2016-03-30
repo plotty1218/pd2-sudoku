@@ -3,6 +3,7 @@
 #include <vector>
 #include <stdio.h>
 #include <time.h>
+#include <cstdlib>
 #include "Sudoku.h"
 
 using namespace std;
@@ -18,6 +19,7 @@ Sudoku::Sudoku(const int init_map[]){
 		map[i]=init_map[i];
 	}
 }
+
 
 void Sudoku::giveQuestion(){
 					   
@@ -54,7 +56,7 @@ void Sudoku::print(int arr[]){
 
 void Sudoku::readIn(){
 	for(int i=0;i<81;i++){
-			cin >> su[i] ;
+		cin >> su[i] ;
 	}
 }
 
@@ -83,7 +85,15 @@ int Sudoku::getFirstZeroIndex(){
 	return -1;
 }
 
-bool Sudoku::multiAns1(int su[]){
+int Sudoku::getFirstZeroIndex2(){
+	for(int i=0;i<sudokuSize;i++){
+		if(su2[i]==0)
+			return i;
+	}	
+	return -1;
+}
+
+bool Sudoku::multiAns1(){
 	int ctr=0;
 	int ctr1=0;
 
@@ -140,7 +150,7 @@ bool Sudoku::multiAns1(int su[]){
 	}
 }
 
-bool Sudoku::multiAns34(int su[]){
+bool Sudoku::multiAns34(){
 	
 	int check[9];
 	int ctr1=0;
@@ -163,12 +173,14 @@ bool Sudoku::multiAns34(int su[]){
 		return false;
 }
 
-bool Sudoku::solvable(int su[]){
+bool Sudoku::solvable(){
 	int tmp[9];
 	int tmp1[9];
 	int tmp2[9];
 
 	for(int i=0;i<81;i=i+9){
+		for(int l=0;l<9;l++)
+			tmp[l]=0;
 		for(int j=i;j<i+9;j++){
 			if(su[j]!=0)
 				tmp[su[j]-1]++;
@@ -177,11 +189,11 @@ bool Sudoku::solvable(int su[]){
 			if(tmp[k]>1)
 				return false;
 		}
-		for(int l=0;l<9;l++)
-			tmp[l]=0;
 	}
 
 	for(int i=0;i<9;i++){
+		for(int l=0;l<9;l++)
+			tmp1[l]=0;
 		for(int j=i;j<i+81;j=j+9){
 			if(su[j]!=0)
 				tmp1[su[j]-1]++;
@@ -190,12 +202,11 @@ bool Sudoku::solvable(int su[]){
 			if(tmp1[k]>1)
 				return false;
 		}
-		for(int l=0;l<9;l++){
-			tmp1[l]=0;
-		}
 	}
 
 	for(int i=0;i<9;i++){
+		for(int l=0;l<9;l++)
+			tmp[l]=0;
 		for(int j=0;j<9;j++){
 			if(su[27*(i/3)+3*(i%3)+9*(j/3)+(j%3)]!=0)
 				tmp2[su[27*(i/3)+3*(i%3)+9*(j/3)+(j%3)]-1]++;
@@ -204,29 +215,110 @@ bool Sudoku::solvable(int su[]){
 			if(tmp2[k]>1)
 				return false;
 		}
-		for(int l=0;l<9;l++){
-			tmp2[l]=0;
+	}
+	return true;
+}
+bool Sudoku::backtracking(){
+
+	int firstZero;
+
+	firstZero=getFirstZeroIndex();
+	if(firstZero==-1){
+		return true;
+	}
+
+	for(int num=1;num<10;num++){
+		if(assignable(num,firstZero)){
+			su[firstZero]=num;
+
+			if(backtracking())
+				return true;
+
+			su[firstZero]=0;
+		}
+	}
+	return false;
+}
+
+bool Sudoku::secondBacktrack(){
+
+	int firstZero;
+
+	firstZero=getFirstZeroIndex2();
+	if(firstZero==-1){
+		return true;
+	}
+
+	for(int num=9;num>0;num--){
+		if(assignable(num,firstZero)){
+			su2[firstZero]=num;
+
+			if(secondBacktrack())
+				return true;
+
+			su2[firstZero]=0;
+		}
+	}
+	return false;
+}
+
+bool Sudoku::ifSameSu(){
+	for(int i=0;i<81;i++){
+		if(su[i]!=su2[i])
+			return false;
+	}
+	return true;
+}
+
+void Sudoku::solve(){
+
+	if(!solvable()){
+		cout << 0 << endl;
+		exit(1);
+	}
+	if(multiAns1() || multiAns34()){
+		cout << 2 << endl;
+		exit(2);
+	}
+	for(int i=0;i<81;i++){
+		su2[i]=su[i];
+	}
+	if(!backtracking()){
+		cout << 0 << endl ;
+		exit(3);
+	}
+	if(secondBacktrack()){
+		if(ifSameSu()){
+			cout << 1 <<endl;
+			print(su);
+		}else{
+			cout << 2 <<endl;
+		}
+	}
+}
+
+bool Sudoku::assignable(int num,int firstZero){
+	int row;
+	int col;
+	
+	row=firstZero/9;
+	col=firstZero%9;
+	for(int i=row*9;i<row*9+9;i++){
+		if(su[i]==num)
+			return false;
+	}
+	for(int i=col;i<col+73;i=i+9){
+		if(su[i]==num)
+			return false;
+	}
+	for(int j=row-row%3;j<row-row%3+19;j=j+9){	
+		for(int i=col-col%3;i<col-col%3+3;i++){
+			if(su[j*9+i]==num)
+				return false;
 		}
 	}
 	return true;
 }
-void Sudoku::solve(){
-
-	int firstZero;
-	readIn();
-
-	if(!solvable(su))
-		cout << 0 << endl;
-	if(multiAns1(su) || multiAns34(su))
-		cout << 2 << endl;
-
-	firstZero=getFirstZeroIndex();
-	if(firstZero==-1){
-		
-	}
-}
-
-
 
 
 
