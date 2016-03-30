@@ -8,43 +8,108 @@
 
 using namespace std;
 
-Sudoku::Sudoku(){
-	for(int i=0;i<sudokuSize;++i){
-		map[i]=0;
-	}
-}
-
-Sudoku::Sudoku(const int init_map[]){
-	for(int i=0;i<sudokuSize;++i){
-		map[i]=init_map[i];
-	}
-}
-
+Sudoku::Sudoku(){ }
 
 void Sudoku::giveQuestion(){
 					   
 	int ans1[sudokuSize] = {9,6,2,7,4,5,8,3,1,5,7,1,9,3,8,6,2,4,4,8,3,6,2,1,9,5,7,2,3,6,1,5,9,7,4,8,7,1,9,2,8,4,3,6,5,8,4,5,3,7,6,2,1,9,3,5,4,8,9,2,1,7,6,6,2,8,4,1,7,5,9,3,1,9,7,5,6,3,4,8,2};
 	int ans2[sudokuSize] = {6,9,8,5,3,4,2,1,7,3,4,7,2,8,1,5,6,9,1,2,5,7,6,9,4,3,8,7,3,9,4,2,6,1,8,5,8,6,2,3,1,5,7,9,4,4,5,1,9,7,8,6,2,3,2,1,3,8,5,7,9,4,6,5,8,4,6,9,2,3,7,1,9,7,6,1,4,3,8,5,2};
-	
+
 	srand(time(NULL));
-	
+
 	switch(rand()%2){
 		case 0 :
-			for(int i=0;i<30;i++){
+
+			for(int i=0;i<4;i++){
 				ans1[rand()%81]=0;
+			}
+			for(int i=0;i<81;i++){
+				su[i]=ans1[i];
+			}
+			
+			changeRow(rand()%3,rand()%3);
+			changeCol(rand()%3,rand()%3);
+			changeNum(rand()%10,rand()%10);
+			rotate(rand()%101);
+			flip(rand()%2);
+
+			for(int i=0;i<81;i++){
+				ans1[i]=su[i];
+				su2[i]=su[i];
+			}
+			
+			while(1){
+				int j=rand()%81;
+				su[j]=0;
+				su2[j]=0;
+				if(checkQues()){
+					ans1[j]=0;
+					for(int i=0;i<81;i++){
+						su[i]=ans1[i];
+						su2[i]=ans1[i];
+					}
+				}
+				else{
+					break;
+				}
 			}
 			print(ans1);
 			break;
 		
 		case 1 :
-			for(int i=0;i<30;i++){
+			for(int i=0;i<4;i++){
 				ans2[rand()%81]=0;
 			} 
+			for(int i=0;i<81;i++){
+				su[i]=ans2[i];
+			}
+
+			changeRow(rand()%3,rand()%3);
+			changeCol(rand()%3,rand()%3);
+			changeNum(rand()%10,rand()%10);
+			rotate(rand()%101);
+			flip(rand()%2);
+
+			for(int i=0;i<81;i++){
+				ans2[i]=su[i];
+				su2[i]=su[i];
+			}
+
+			while(1){
+				int j=rand()%81;
+				su[j]=0;
+				su2[j]=0;
+				if(checkQues()){
+					ans2[j]=0;
+					for(int i=0;i<81;i++){
+						su[i]=ans2[i];
+						su2[i]=ans2[i];
+					}
+				}
+				else
+					break;
+			}
 			print(ans2);
 			break;	
 	}
 }
 	
+bool Sudoku::checkQues(){
+
+	if(!backtracking()){
+		return false;
+	}
+
+	secondBacktrack();
+
+	if(ifSameSu()){	
+		return true;
+	}else{
+		return false;
+		}
+}
+
+
 void Sudoku::print(int arr[]){
 	for(int i=0;i<9;i++){
 		for(int j=0;j<9;j++){
@@ -57,10 +122,11 @@ void Sudoku::print(int arr[]){
 void Sudoku::readIn(){
 	for(int i=0;i<81;i++){
 		cin >> su[i] ;
+		su2[i]=su[i];
 	}
 }
 
-bool Sudoku::checkUnity(int arr[]){
+/*bool Sudoku::checkUnity(int arr[]){
 
 	int arr_unity[9];
 
@@ -76,18 +142,11 @@ bool Sudoku::checkUnity(int arr[]){
 	}
 	return true;
 }
+*/
 
-int Sudoku::getFirstZeroIndex(){
+int Sudoku::getFirstZeroIndex(int arr[]){
 	for(int i=0;i<sudokuSize;i++){
-		if(su[i]==0)
-			return i;
-	}	
-	return -1;
-}
-
-int Sudoku::getFirstZeroIndex2(){
-	for(int i=0;i<sudokuSize;i++){
-		if(su2[i]==0)
+		if(arr[i]==0)
 			return i;
 	}	
 	return -1;
@@ -173,6 +232,113 @@ bool Sudoku::multiAns34(){
 		return false;
 }
 
+bool Sudoku::backtracking(){
+
+	int firstZero;
+
+	firstZero=getFirstZeroIndex(su);
+	if(firstZero==-1){
+		return true;
+	}
+
+	for(int num=1;num<10;num++){
+		if(assignable(num,firstZero,su)){
+			su[firstZero]=num;
+
+			if(backtracking())
+				return true;
+
+			su[firstZero]=0;
+		}
+	}
+	return false;
+}
+
+bool Sudoku::secondBacktrack(){
+
+	int firstZero2;
+
+	firstZero2=getFirstZeroIndex(su2);
+	if(firstZero2==-1){
+		return true;
+	}
+
+	for(int num2=9;num2>0;num2--){
+		if(assignable(num2,firstZero2,su2)){
+			su2[firstZero2]=num2;
+
+			if(secondBacktrack())
+				return true;
+
+			su2[firstZero2]=0;
+		}
+	}
+	return false;
+}
+
+bool Sudoku::ifSameSu(){
+	for(int i=0;i<81;i++){
+		if(su[i]!=su2[i])
+			return false;
+	}
+	return true;
+}
+
+void Sudoku::solve(){
+
+	if(!solvable()){
+		cout << 0 << endl;
+		exit(1);
+	}
+/*	if(multiAns1() || multiAns34()){
+		cout << 2 << endl;
+		exit(2);
+	}
+*/
+	if(!backtracking()){
+		cout << 0 << endl ;
+		exit(3);
+	}
+
+	secondBacktrack();
+
+	if(ifSameSu()){
+		cout << 1 <<endl;	
+		print(su);
+		exit(4);
+	}else{
+		cout << 2 <<endl;
+		exit(5);
+		}
+	
+}
+
+bool Sudoku::assignable(int num,int firstZero,int arr[]){
+	int row;
+	int col;
+	
+	row=firstZero/9;
+	col=firstZero%9;
+	for(int i=row*9;i<row*9+9;i++){
+		if(arr[i]==num){
+			return false;}
+	}
+	for(int i=col;i<col+81;i=i+9){
+		if(arr[i]==num){
+			return false;
+		}
+	}
+	for(int j=row-row%3;j<row-row%3+3;j=j+1){	
+		for(int i=col-col%3;i<col-col%3+3;i++){
+			if(arr[j*9+i]==num){
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+
 bool Sudoku::solvable(){
 	int tmp[9];
 	int tmp1[9];
@@ -206,7 +372,7 @@ bool Sudoku::solvable(){
 
 	for(int i=0;i<9;i++){
 		for(int l=0;l<9;l++)
-			tmp[l]=0;
+			tmp2[l]=0;
 		for(int j=0;j<9;j++){
 			if(su[27*(i/3)+3*(i%3)+9*(j/3)+(j%3)]!=0)
 				tmp2[su[27*(i/3)+3*(i%3)+9*(j/3)+(j%3)]-1]++;
@@ -218,109 +384,6 @@ bool Sudoku::solvable(){
 	}
 	return true;
 }
-bool Sudoku::backtracking(){
-
-	int firstZero;
-
-	firstZero=getFirstZeroIndex();
-	if(firstZero==-1){
-		return true;
-	}
-
-	for(int num=1;num<10;num++){
-		if(assignable(num,firstZero)){
-			su[firstZero]=num;
-
-			if(backtracking())
-				return true;
-
-			su[firstZero]=0;
-		}
-	}
-	return false;
-}
-
-bool Sudoku::secondBacktrack(){
-
-	int firstZero;
-
-	firstZero=getFirstZeroIndex2();
-	if(firstZero==-1){
-		return true;
-	}
-
-	for(int num=9;num>0;num--){
-		if(assignable(num,firstZero)){
-			su2[firstZero]=num;
-
-			if(secondBacktrack())
-				return true;
-
-			su2[firstZero]=0;
-		}
-	}
-	return false;
-}
-
-bool Sudoku::ifSameSu(){
-	for(int i=0;i<81;i++){
-		if(su[i]!=su2[i])
-			return false;
-	}
-	return true;
-}
-
-void Sudoku::solve(){
-
-	if(!solvable()){
-		cout << 0 << endl;
-		exit(1);
-	}
-	if(multiAns1() || multiAns34()){
-		cout << 2 << endl;
-		exit(2);
-	}
-	for(int i=0;i<81;i++){
-		su2[i]=su[i];
-	}
-	if(!backtracking()){
-		cout << 0 << endl ;
-		exit(3);
-	}
-	if(secondBacktrack()){
-		if(ifSameSu()){
-			cout << 1 <<endl;
-			print(su);
-		}else{
-			cout << 2 <<endl;
-		}
-	}
-}
-
-bool Sudoku::assignable(int num,int firstZero){
-	int row;
-	int col;
-	
-	row=firstZero/9;
-	col=firstZero%9;
-	for(int i=row*9;i<row*9+9;i++){
-		if(su[i]==num)
-			return false;
-	}
-	for(int i=col;i<col+73;i=i+9){
-		if(su[i]==num)
-			return false;
-	}
-	for(int j=row-row%3;j<row-row%3+19;j=j+9){	
-		for(int i=col-col%3;i<col-col%3+3;i++){
-			if(su[j*9+i]==num)
-				return false;
-		}
-	}
-	return true;
-}
-
-
 
 
 void Sudoku::changeNum(int a,int b){
@@ -560,7 +623,6 @@ void Sudoku::rotate(int n){
 
 void Sudoku::transform(){
 
-	readIn();
 	srand(time(NULL));
 	changeRow(rand()%3,rand()%3);
 	changeCol(rand()%3,rand()%3);

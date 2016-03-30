@@ -3,34 +3,31 @@
 class Sudoku{
 	public:
 		Sudoku();
-		Sudoku(const int init_map[]);
-		void setMap(const int set_map[]);
-		bool isCorrect();
+		//bool isCorrect();
 		void giveQuestion();
 		void readIn();
+		bool checkQues();
 		void solve();
-		static const int sudokuSize=81;
-		void print(int arr[]);
 		void changeNum(int a,int b);
 		void changeRow(int a,int b);
 		void changeCol(int a,int b);
 		void rotate(int n);
 		void flip(int n);
 		void transform();
+	
+	private:
+		//bool checkUnity(int arr[]);	
+		static const int sudokuSize=81;
+		int su2[sudokuSize];
+		int su[sudokuSize];	
+		void print(int arr[]);
 		bool multiAns1();
 		bool multiAns34();
 		bool solvable();
-		int getFirstZeroIndex();
-		int getFirstZeroIndex2();
+		int getFirstZeroIndex(int []);
 		bool backtracking();
 		bool secondBacktrack();
 		bool ifSameSu();	
-		bool assignable(int,int);
-
-	private:
-		bool checkUnity(int arr[]);
-		int map[sudokuSize];
-		int su2[sudokuSize];
-		int su[sudokuSize];
+		bool assignable(int,int,int []);
 };
 
