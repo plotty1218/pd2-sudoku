@@ -283,6 +283,87 @@ bool Sudoku::solvable(){
 	return true;
 }
 
+bool Sudoku::multiAns1(){
+	int ctr=0;
+	int ctr1=0;
+
+	for(int j=0;j<7;j=j+3){
+		for(int i=j*9;i<j*9+9;i++){
+			if(su[i]==0)
+				ctr++;
+		}
+		if(ctr==9)
+			ctr1++;
+		ctr=0;
+		for(int i=j*9+9;i<j*9+18;i++){
+			if(su[i]==0)
+				ctr++;
+		}
+		if(ctr==9)
+			ctr1++;
+		ctr=0;
+		for(int i=j*9+18;i<j*9+27;i++){
+			if(su[i]==0)
+				ctr++;
+		}
+		if(ctr==9)
+			ctr1++;
+		if(ctr1>1)
+			return true;
+	}
+	ctr=0;
+	ctr1=0;
+	
+	for(int i=0;i<3;i++){
+		for(int j=i*3;j<i*3+73;j=j+9){
+			if(su[j]==0)
+				ctr++;
+		}
+		if(ctr==9)
+			ctr1++;
+		ctr=0;
+		for(int j=i*3+1;j<i*3+74;j=j+9){
+			if(su[j]==0)
+				ctr++;
+		}
+		if(ctr==9)
+			ctr1++;
+		ctr=0;
+		for(int j=i*3+2;j<i*3+75;j=j+9){
+			if(su[j]==0)
+				ctr++;
+		}
+		if(ctr==9)
+			ctr1++;
+		if(ctr1>1)
+			return true;
+	}
+}
+
+bool Sudoku::multiAns34(){
+	
+	int check[9];
+	int ctr1=0;
+	int ctr2=0;
+
+	for(int i=0;i<81;i++){
+		if(su[i]!=0)
+			check[su[i]-1]++;
+		else
+			ctr2++;
+	}
+	for(int i=0;i<9;i++){
+		if(check[i]==0)
+			ctr1++;
+	}
+
+	if(ctr1>1 || ctr2>64)
+		return true;
+	else
+		return false;
+}
+
+
 void Sudoku::changeNum(int a,int b){
 	
 	vector<int> tmp1;
@@ -547,5 +628,3 @@ void Sudoku::transform(){
 	print(su);
 
 }
-
-	
