@@ -3,10 +3,8 @@
 class Sudoku{
 	public:
 		Sudoku();
-		//bool isCorrect();
 		void giveQuestion();
 		void readIn();
-		bool checkQues();
 		void solve();
 		void changeNum(int a,int b);
 		void changeRow(int a,int b);
@@ -16,7 +14,7 @@ class Sudoku{
 		void transform();
 	
 	private:
-		//bool checkUnity(int arr[]);	
+		bool checkQues();	
 		static const int sudokuSize=81;
 		int su2[sudokuSize];
 		int su[sudokuSize];	
