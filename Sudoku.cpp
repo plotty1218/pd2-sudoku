@@ -412,7 +412,7 @@ void Sudoku::changeRow(int a,int b){
 void Sudoku::changeCol(int a,int b){
 	
 	int tmp[27];
-
+	
 	for(int i=0,j=3*a ; i<9 ; i++,j=j+9){
 		tmp[i]=su[j];
 	}
@@ -620,9 +620,25 @@ void Sudoku::rotate(int n){
 void Sudoku::transform(){
 
 	srand(time(NULL));
-	changeRow(rand()%3,rand()%3);
-	changeCol(rand()%3,rand()%3);
-	changeNum(rand()%10,rand()%10);
+	int a,b,c,d,e,f;
+	do{
+		a=rand()%3;
+		b=rand()%3;
+	}while(a==b);
+	
+	do{
+		c=rand()%3;
+		d=rand()%3;
+	}while(c==d);
+
+	do{
+		e=rand()%10;
+		f=rand()%10;
+	}while(e==f);
+
+	changeRow(a,b);
+	changeCol(c,d);
+	changeNum(e,f);
 	rotate(rand()%101);
 	flip(rand()%2);
 	print(su);
